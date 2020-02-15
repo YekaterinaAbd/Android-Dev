@@ -9,6 +9,8 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
+
+
     <TextView
         android:id="@+id/calcText"
         android:text=""
@@ -115,6 +117,7 @@
             android:layout_weight="1"
             android:background="#1E2126"
             android:fontFamily="sans-serif-light"
+            android:textAllCaps="false"
             android:text="x²"
             android:textColor="#82AEF7"
             android:textSize="25sp" />
@@ -323,10 +326,10 @@
             android:fontFamily="sans-serif-light"
             android:textSize="25sp" />
 
-
     </LinearLayout>
 
-</LinearLayout>
+
+    </LinearLayout>
 
 
 </LinearLayout>

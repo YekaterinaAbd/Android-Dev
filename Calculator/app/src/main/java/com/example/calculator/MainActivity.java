@@ -1,11 +1,14 @@
 package com.example.calculator;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -18,6 +21,13 @@ enum State {
 
 public class MainActivity extends AppCompatActivity {
 
+
+
+
+    TextView calcText;
+    TextView operText;
+    String text;
+
     double firstNum;
     double secondNum;
     double answer;
@@ -29,13 +39,48 @@ public class MainActivity extends AppCompatActivity {
 
     State state= State.NULL;
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        firstNum = savedInstanceState.getDouble("firstNum");
+        secondNum= savedInstanceState.getDouble("secondNum");
+        isDouble = savedInstanceState.getBoolean("isDouble");
+        zeroUsed = savedInstanceState.getBoolean("zeroUsed");
+        isError = savedInstanceState.getBoolean("isError");
+        answer= savedInstanceState.getDouble("answer");
+        state = (State)savedInstanceState.getSerializable("state");
+        operation = savedInstanceState.getString("operation");
+
+        text = savedInstanceState.getString("calcText");
+        calcText.setText(text);
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putDouble("firstNum", firstNum);
+        outState.putDouble("secondNum", secondNum);
+        outState.putDouble("answer", answer);
+        outState.putString("operation", operation);
+
+        outState.putBoolean("isDouble", isDouble);
+        outState.putBoolean("zeroUsed", zeroUsed);
+        outState.putBoolean("isError", isError);
+
+        outState.putSerializable("state", state);
+        outState.putString("calcText", calcText.getText().toString());
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final TextView calcText = findViewById(R.id.calcText);
+        calcText = findViewById(R.id.calcText);
+        operText = findViewById(R.id.opView);
         final Button bt0 = findViewById(R.id.btn0);
         final Button bt1 = findViewById(R.id.btn1);
         final Button bt2 = findViewById(R.id.btn2);
@@ -58,6 +103,17 @@ public class MainActivity extends AppCompatActivity {
         final Button btRoot = findViewById(R.id.btn_root);
         final Button btSquared = findViewById(R.id.btn_square);
 
+        final Button btFactorial = findViewById(R.id.btn_factorial);
+        final Button btPowerN = findViewById(R.id.btn_powern);
+        final Button btNRoot = findViewById(R.id.btn_nroot);
+        final Button btTenPow = findViewById(R.id.btn_tenPow);
+
+        final Button btSin = findViewById(R.id.btn_sin);
+        final Button btCos = findViewById(R.id.btn_cos);
+        final Button btTan = findViewById(R.id.btn_tan);
+        final Button btLn = findViewById(R.id.btn_ln);
+        final Button btLog = findViewById(R.id.btn_log);
+
 
 
       View.OnClickListener calcOnclick = new View.OnClickListener() {
@@ -73,8 +129,6 @@ public class MainActivity extends AppCompatActivity {
                   firstNum = Double.parseDouble(calcText.getText().toString());
                   calcText.setText("");
               }
-
-
 
               switch (id){
 
@@ -203,93 +257,202 @@ public class MainActivity extends AppCompatActivity {
 
                   case R.id.btn_plus:
                       if(state!=State.NULL){
-                      if(state != State.OPERATION)  state=State.OPERATION;
+                      if(state != State.OPERATION)
+                          state=State.OPERATION;
                       else state=State.NUMBER;
-                      operation += '+';}
+                      operation += '+'; }
                     break;
 
 
                   case R.id.btn_minus:
                       if(state!=State.NULL){
-                      if(state != State.OPERATION)  state=State.OPERATION;
+                      if(state != State.OPERATION)
+                          state=State.OPERATION;
                       else state=State.NUMBER;
-                      operation += '-';}
+                      operation += '-'; }
                     break;
 
 
                   case R.id.btn_multiply:
                       if(state!=State.NULL){
-                      if(state != State.OPERATION)  state=State.OPERATION;
+                      if(state != State.OPERATION)
+                          state=State.OPERATION;
                       else state=State.NUMBER;
-                      operation += '*';}
+                      operation += '*'; }
                       break;
 
                   case R.id.btn_divide:
                       if(state!=State.NULL){
                       if(state != State.OPERATION)  state=State.OPERATION;
                       else state=State.NUMBER;
-                      operation += '/';}
+                      operation += '/'; }
                       break;
 
-                  case R.id.btn_equal:
+                  case R.id.btn_powern:
                       if(state!=State.NULL){
-                      state=State.EQUAL;
-                      secondNum = Double.parseDouble(calcText.getText().toString());
+                          //if(state != State.OPERATION)
+                              state=State.OPERATION;
+                         // else state=State.NUMBER;
+                          operation = "n";
+                          operText.setText(calcText.getText().toString() + "^");
+                      }
+                      break;
 
-                      if(operation == " "){}
+                  case R.id.btn_nroot:
+                      if(state!=State.NULL) {
+                          //if (state != State.OPERATION)
+                              state = State.OPERATION;
+                          //else state = State.NUMBER;
+                          operation = "b";
+                          operText.setText(calcText.getText().toString() + "^(1/");
+                      }
+                      break;
 
-                          NumberFormat nf = new DecimalFormat("#.######");
 
-                      switch (operation.charAt(operation.length() - 1)){
+                  case R.id.btn_equal:
 
-                          case '+':
-                              answer=firstNum+secondNum;
-                              calcText.setText(nf.format(answer));
-                              break;
-                          case '-':
-                              answer= firstNum-secondNum;
-                              calcText.setText(nf.format(answer));
-                              break;
-                          case '*':
-                              answer=firstNum*secondNum;
-                              calcText.setText(nf.format(answer));
-                              break;
-                          case '/':
-                              if(secondNum == 0) {
-                                  answer = 0;
-                                  calcText.setText("Error");
-                                  isError = true;
-                              }
-                              else {
-                                  answer=firstNum/secondNum;
-                                  calcText.setText(nf.format(answer));
-                              }
-                              break;
-                          case 'r':
-                              answer=Math.sqrt(secondNum);
-                              calcText.setText(nf.format(answer));
-                              break;
-                          case '^':
-                              answer=secondNum*secondNum;
-                              calcText.setText(nf.format(answer));
-                              break;
-                         case ' ':
-                              answer=secondNum;
-                             calcText.setText(nf.format(answer));
-                              break;
-                          case '%':
-
-                              answer = secondNum/100;
-                              calcText.setText(nf.format(answer));
-                              break;
+                      if(calcText.getText().toString().equals("")){
+                          operation="";
+                          firstNum=0;
+                          state=State.NULL;
+                          isError=true;
+                          calcText.setText("Error");
                       }
 
-                      firstNum = answer;
-                      secondNum=0;
-                      isDouble=false;
-                      zeroUsed = false;
-                      operation= " ";
-                      state=State.NUMBER;}
+                      else {
+
+                          if (state != State.NULL) {
+
+                              if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                                  operText.setText("");
+
+                              state = State.EQUAL;
+                              secondNum = Double.parseDouble(calcText.getText().toString());
+
+                              if (operation == " ") {}
+
+
+                              NumberFormat nf = new DecimalFormat("#.######");
+
+                              switch (operation.charAt(operation.length() - 1)) {
+
+                                  case '+':
+                                      answer = firstNum + secondNum;
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                                  case '-':
+                                      answer = firstNum - secondNum;
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                                  case '*':
+                                      answer = firstNum * secondNum;
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                                  case '/':
+                                      if (secondNum == 0) {
+                                          answer = 0;
+                                          calcText.setText("Error");
+                                          isError = true;
+                                      } else {
+                                          answer = firstNum / secondNum;
+                                          calcText.setText(nf.format(answer));
+                                      }
+                                      break;
+                                  case 'r':
+                                      answer = Math.sqrt(secondNum);
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                                  case '^':
+                                      answer = secondNum * secondNum;
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                                  case ' ':
+                                      answer = secondNum;
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                                  case '%':
+
+                                      answer = secondNum / 100;
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case '!':
+                                      answer = 1;
+                                      if (secondNum < 0 || secondNum > 100) {
+
+                                          calcText.setText("Error");
+                                          isError = true;
+                                      } else {
+                                          if (secondNum == 0) answer = 1;
+                                          else {
+                                              for (int i = 1; i <= secondNum; i++) {
+                                                  answer *= i;
+                                              }
+                                          }
+                                          calcText.setText(nf.format(answer));
+                                      }
+                                      break;
+
+                                  case 'n':
+                                      answer = Math.pow(firstNum, secondNum);
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case 'b':
+                                      //nroot
+                                      if (secondNum == 0) {
+                                          calcText.setText("Error");
+                                          isError = true;
+                                      } else {
+                                          answer = Math.pow(firstNum, 1 / secondNum);
+                                          calcText.setText(nf.format(answer));
+                                      }
+                                      break;
+
+                                  case 't':
+                                      //tenPower 10^a
+                                      answer = Math.pow(10, secondNum);
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case 's':
+                                      //sin
+                                      answer = Math.sin(Math.toRadians(secondNum));
+
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case 'c':
+                                      //cos
+                                      answer = Math.cos(Math.toRadians(secondNum));
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case 'a':
+                                      //tan
+                                      answer = Math.tan(Math.toRadians(secondNum));
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case 'l':
+                                      answer = Math.log(secondNum);
+                                      calcText.setText(nf.format(answer));
+                                      break;
+
+                                  case 'g':
+                                      answer = Math.log10(secondNum);
+                                      calcText.setText(nf.format(answer));
+                                      break;
+                              }
+
+                          firstNum = answer;
+                          secondNum = 0;
+                          isDouble = false;
+                          zeroUsed = false;
+                          operation = " ";
+                          state = State.NUMBER;
+                          }
+                      }
                       break;
 
                   case R.id.btn_c:
@@ -300,12 +463,20 @@ public class MainActivity extends AppCompatActivity {
                       state=State.NULL;
                       zeroUsed=false;
                       isDouble=false;
+                      if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                      operText.setText("");
                       break;
 
                   case R.id.btn_del:
                       String s = calcText.getText().toString();
-                      s = s.substring(0, s.length()-1);
-                      calcText.setText(s);
+                      int len = s.length();
+                      if(len > 0) {
+                          s = s.substring(0,len - 1);
+                          calcText.setText(s);
+                      }else{
+
+
+                      }
                       break;
 
                   case R.id.btn_root:
@@ -315,19 +486,58 @@ public class MainActivity extends AppCompatActivity {
 
                   case R.id.btn_square:
                       if(state!=State.NULL){
-                      operation="^";}
+                      operation="^";
+                      }
                       break;
 
                   case R.id.btn_percent:
                       if(state!=State.NULL){
-                          operation="%";}
+                          operation="%"; }
                       break;
 
+                  case R.id.btn_factorial:
+                      if(state!=State.NULL){
+                          operation="!";
+                          operText.setText("!");}
+                      break;
+
+                  case R.id.btn_tenPow:
+                      if(state!=State.NULL){
+                          operation="t";
+                          operText.setText("10^");
+                      }
+                      break;
+
+
+                  case R.id.btn_sin:
+
+                      state=State.NUMBER;
+                      operation += 's';
+                      operText.setText("sin");
+                    break;
+
+                  case R.id.btn_cos:
+                      operation="c";
+                      operText.setText("cos");
+                      break;
+
+                  case R.id.btn_tan:
+                      operation="a";
+                      operText.setText("tan");
+                      break;
+
+                  case R.id.btn_ln:
+                      operation="l";
+                      operText.setText("ln");
+                      break;
+                  case R.id.btn_log:
+                      operation="g";
+                      operText.setText("log");
+                      break;
               }
           }
       };
 
-      bt0.setOnClickListener(calcOnclick);
         bt0.setOnClickListener(calcOnclick);
         bt1.setOnClickListener(calcOnclick);
         bt2.setOnClickListener(calcOnclick);
@@ -350,11 +560,17 @@ public class MainActivity extends AppCompatActivity {
         btRoot.setOnClickListener(calcOnclick);
         btPercent.setOnClickListener(calcOnclick);
 
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            btFactorial.setOnClickListener(calcOnclick);
+            btPowerN.setOnClickListener(calcOnclick);
+            btNRoot.setOnClickListener(calcOnclick);
+            btTenPow.setOnClickListener(calcOnclick);
 
-
-
-
+            btSin.setOnClickListener(calcOnclick);
+            btCos.setOnClickListener(calcOnclick);
+            btTan.setOnClickListener(calcOnclick);
+            btLn.setOnClickListener(calcOnclick);
+            btLog.setOnClickListener(calcOnclick);
+        }
     }
-
-
 }
