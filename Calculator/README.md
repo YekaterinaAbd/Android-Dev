@@ -7,7 +7,7 @@ numbers 0-9;
 
 dot;
 
-operations: + - * \, square root, percent, square(x^2);
+operations: + - * /, square root, percent, square(x^2);
 
 buttons to remove one element and all elements;
 
