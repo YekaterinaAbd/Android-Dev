@@ -1,7 +1,7 @@
 # Calculator
 
 
-1. Portrait orientation
+1.Portrait orientation
 
 numbers 0-9;
 
@@ -18,6 +18,7 @@ only one dot excepted(no "0.0.8875..");
 if there is no number and dot is clicked text is "0.";
 
 if the first number is 0 and another nonzero number clicked, 0 dissapears (0 pressed -> 1 pressed, output = 1, but not "01");
+
 
 2.Landscape orientation
 
