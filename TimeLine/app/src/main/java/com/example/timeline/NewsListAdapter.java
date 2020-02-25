@@ -1,7 +1,7 @@
 package com.example.timeline;
 
+
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -18,11 +19,15 @@ import java.util.List;
 public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsViewHolder> {
 
     private List<News> newsList;
+    private ItemClickListener listener;
+
+    boolean clicked = false;
     Context c;
 
 
-    public NewsListAdapter(List<News> newsList, Context c) {
+    public NewsListAdapter(List<News> newsList, @Nullable ItemClickListener listener, Context c) {
         this.newsList = newsList;
+        this.listener = listener;
         this.c = c;
     }
 
@@ -47,7 +52,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(@NonNull NewsViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final NewsViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         final News news = newsList.get(position);
@@ -64,32 +69,54 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         holder.tvImage.setImageResource(news.getImg());
 
 
-        holder.setItemClickListener(new ItemClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void itemClick(View view, int position) {
-
-                Intent intent = new Intent(c,NewsOnClickActivity.class);
-                intent.putExtra("news", news);
-                c.startActivity(intent);
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.itemClick(position, news);
+                }
             }
         });
 
+        holder.like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(!clicked) {
+                    holder.like.setImageResource(R.drawable.blueheart);
+                    int s = Integer.parseInt(holder.tvLikesCount.getText().toString()) + 1;
+                    holder.tvLikesCount.setText(String.valueOf(s));
+                    holder.tvLikesCount.setTextColor(Color.parseColor("#3B6FA1"));
+                    Toast toast = Toast.makeText(c, "Добавлено в избранное", Toast.LENGTH_SHORT);
+                    toast.show();
+                    clicked = true;
+                }else{
+                    holder.like.setImageResource(R.drawable.heart);
+                    int s = Integer.parseInt(holder.tvLikesCount.getText().toString()) - 1;
+                    holder.tvLikesCount.setText(String.valueOf(s));
+                    holder.tvLikesCount.setTextColor(Color.parseColor("#A6A9B0"));
+                    clicked = false;
+            }
+        }
+    });
 
     }
+
 
     @Override
     public int getItemCount() {
         return newsList.size();
     }
 
-
+    public int getItemViewType(int position) {
+        return position;
+    }
 
     //newsHolder class
-    public class NewsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class NewsViewHolder extends RecyclerView.ViewHolder{
 
-        ItemClickListener listener;
 
-        TextView tvName;
+       final TextView tvName;
         TextView tvDate;
         TextView tvText;
         TextView tvCommentsCount;
@@ -98,10 +125,10 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         TextView tvViewsCount;
         ImageView tvImage;
 
-        //ImageView like;
-        boolean clicked = false;
+       final ImageView like;
 
-        NewsViewHolder(@NonNull View itemView){
+        NewsViewHolder(@NonNull View itemView) {
+
             super(itemView);
 
             tvName = itemView.findViewById(R.id.autor);
@@ -113,49 +140,14 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
             tvViewsCount = itemView.findViewById(R.id.view_text);
             tvImage = itemView.findViewById(R.id.imageView3);
 
-            ImageView like = itemView.findViewById(R.id.like_btn);
+            like = itemView.findViewById(R.id.like_btn);
 
-
-            like.setOnClickListener(viewOnClick);
-            tvLikesCount.setOnClickListener(viewOnClick);
-
-            itemView.setOnClickListener(this);
-
-        }
-
-        View.OnClickListener viewOnClick = new View.OnClickListener(){
-            public void onClick(View v){
-
-                ImageView like = itemView.findViewById(R.id.like_btn);
-                if(!clicked) {
-                    like.setImageResource(R.drawable.blueheart);
-                    int s = Integer.parseInt(tvLikesCount.getText().toString()) + 1;
-                    tvLikesCount.setText(String.valueOf(s));
-                    tvLikesCount.setTextColor(Color.parseColor("#3B6FA1"));
-                    Toast toast = Toast.makeText(c, "Добавлено в избранное", Toast.LENGTH_SHORT);
-                    toast.show();
-                    clicked = true;
-                }else{
-                    like.setImageResource(R.drawable.heart);
-                    int s = Integer.parseInt(tvLikesCount.getText().toString()) - 1;
-                    tvLikesCount.setText(String.valueOf(s));
-                    tvLikesCount.setTextColor(Color.parseColor("#A6A9B0"));
-                    clicked = false;
-
-                }
-            }
-        };
-
-
-        @Override
-        public void onClick(View view) {
-
-            this.listener.itemClick(view, getLayoutPosition());
-        }
-
-        public void setItemClickListener(ItemClickListener ic){
-            this.listener=ic;
         }
     }
+
+    interface ItemClickListener {
+        void itemClick(int position, News item);
+    }
+
 }
 
