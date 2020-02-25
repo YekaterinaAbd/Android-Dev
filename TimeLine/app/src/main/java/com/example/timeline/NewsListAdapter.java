@@ -61,18 +61,18 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         holder.tvLikesCount.setText(String.valueOf(news.getLikesCount()));
         holder.tvCommentsCount.setText(String.valueOf(news.getCommentsCount()));
 
-       holder.tvImage.setImageResource(news.getImg());
+        holder.tvImage.setImageResource(news.getImg());
 
 
-       holder.setItemClickListener(new ItemClickListener() {
-           @Override
-           public void itemClick(View view, int position) {
+        holder.setItemClickListener(new ItemClickListener() {
+            @Override
+            public void itemClick(View view, int position) {
 
-               Intent intent = new Intent(c,NewsOnClickActivity.class);
-               intent.putExtra("news", news);
-               c.startActivity(intent);
-           }
-       });
+                Intent intent = new Intent(c,NewsOnClickActivity.class);
+                intent.putExtra("news", news);
+                c.startActivity(intent);
+            }
+        });
 
 
     }
@@ -98,40 +98,41 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         TextView tvViewsCount;
         ImageView tvImage;
 
-        ImageView like;
+        //ImageView like;
         boolean clicked = false;
 
-    NewsViewHolder(@NonNull View itemView){
-        super(itemView);
+        NewsViewHolder(@NonNull View itemView){
+            super(itemView);
 
-        tvName = itemView.findViewById(R.id.autor);
-        tvDate = itemView.findViewById(R.id.date);
-        tvText = itemView.findViewById(R.id.vText);
-        tvCommentsCount = itemView.findViewById(R.id.comment_text);
-        tvLikesCount = itemView.findViewById(R.id.like_text);
-        tvRepostCount = itemView.findViewById(R.id.shre_text);
-        tvViewsCount = itemView.findViewById(R.id.view_text);
-        tvImage = itemView.findViewById(R.id.imageView3);
+            tvName = itemView.findViewById(R.id.autor);
+            tvDate = itemView.findViewById(R.id.date);
+            tvText = itemView.findViewById(R.id.vText);
+            tvCommentsCount = itemView.findViewById(R.id.comment_text);
+            tvLikesCount = itemView.findViewById(R.id.like_text);
+            tvRepostCount = itemView.findViewById(R.id.shre_text);
+            tvViewsCount = itemView.findViewById(R.id.view_text);
+            tvImage = itemView.findViewById(R.id.imageView3);
 
-        like = itemView.findViewById(R.id.like_btn);
+            ImageView like = itemView.findViewById(R.id.like_btn);
 
 
-        like.setOnClickListener(viewOnClick);
-        tvLikesCount.setOnClickListener(viewOnClick);
+            like.setOnClickListener(viewOnClick);
+            tvLikesCount.setOnClickListener(viewOnClick);
 
-        itemView.setOnClickListener(this);
+            itemView.setOnClickListener(this);
 
-    }
+        }
 
         View.OnClickListener viewOnClick = new View.OnClickListener(){
             public void onClick(View v){
 
+                ImageView like = itemView.findViewById(R.id.like_btn);
                 if(!clicked) {
                     like.setImageResource(R.drawable.blueheart);
                     int s = Integer.parseInt(tvLikesCount.getText().toString()) + 1;
                     tvLikesCount.setText(String.valueOf(s));
                     tvLikesCount.setTextColor(Color.parseColor("#3B6FA1"));
-                    Toast toast = Toast.makeText(c, "Пост добавлен в избранное", Toast.LENGTH_SHORT);
+                    Toast toast = Toast.makeText(c, "Добавлено в избранное", Toast.LENGTH_SHORT);
                     toast.show();
                     clicked = true;
                 }else{
@@ -149,11 +150,11 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         @Override
         public void onClick(View view) {
 
-        this.listener.itemClick(view, getLayoutPosition());
+            this.listener.itemClick(view, getLayoutPosition());
         }
 
         public void setItemClickListener(ItemClickListener ic){
-        this.listener=ic;
+            this.listener=ic;
         }
     }
 }
