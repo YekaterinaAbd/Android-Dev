@@ -3,6 +3,7 @@ package com.example.timeline;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,17 +21,51 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
 
     private List<News> newsList;
     private ItemClickListener listener;
-
-    boolean clicked = false;
     Context c;
 
+    AddToFavListener favListener;
+    RemoveNewsListener removeFromFavListener;
+    RemoveFromHomeListener removeFromHomeListener;
 
-    public NewsListAdapter(List<News> newsList, @Nullable ItemClickListener listener, Context c) {
+
+    public interface AddToFavListener{
+        void sendNews(News news);
+    }
+
+    public interface RemoveNewsListener{
+        void removeFromFavNews(News news);
+    }
+
+    public interface RemoveFromHomeListener{
+        void removeFromHomeNews(News news);
+    }
+
+    interface ItemClickListener {
+        void itemClick(int position, News item);
+    }
+
+    public NewsListAdapter(List<News> newsList,
+                           @Nullable ItemClickListener listener,
+                           Context c,
+                           @Nullable RemoveNewsListener removeFromFavListener) {
         this.newsList = newsList;
         this.listener = listener;
         this.c = c;
+        this.removeFromFavListener = removeFromFavListener;
     }
 
+
+    public NewsListAdapter(List<News> newsList,
+                           @Nullable ItemClickListener listener,
+                           @Nullable AddToFavListener favListener,
+                           Context c,
+                           @Nullable RemoveFromHomeListener removeFromHomeListener) {
+        this.newsList = newsList;
+        this.listener = listener;
+        this.favListener = favListener;
+        this.c = c;
+        this.removeFromHomeListener = removeFromHomeListener;
+    }
 
     @NonNull
     @Override
@@ -55,6 +90,7 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
     public void onBindViewHolder(@NonNull final NewsViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+       // Log.d("myy", "view holder on");
         final News news = newsList.get(position);
 
         holder.tvName.setText(news.getName());
@@ -63,10 +99,21 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
 
         holder.tvViewsCount.setText(String.valueOf(news.getViewsCount()));
         holder.tvRepostCount.setText(String.valueOf(news.getRepostsCount()));
-        holder.tvLikesCount.setText(String.valueOf(news.getLikesCount()));
+
+
         holder.tvCommentsCount.setText(String.valueOf(news.getCommentsCount()));
 
         holder.tvImage.setImageResource(news.getImg());
+
+        holder.tvLikesCount.setText(String.valueOf(news.getLikesCount()));
+
+        if(news.isClicked){
+            holder.like.setImageResource(R.drawable.blueheart);
+            holder.tvLikesCount.setTextColor(Color.parseColor("#3B6FA1"));
+        }else{
+            holder.like.setImageResource(R.drawable.heart);
+            holder.tvLikesCount.setTextColor(Color.parseColor("#A6A9B0"));
+        }
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -79,24 +126,43 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         });
 
         holder.like.setOnClickListener(new View.OnClickListener() {
+
+          //  boolean clicked = false;
+
             @Override
             public void onClick(View view) {
 
-                if(!clicked) {
+                if(!news.isClicked) {
+
+
+                    if(favListener != null){
+                    favListener.sendNews(news);}
+
+
                     holder.like.setImageResource(R.drawable.blueheart);
                     int s = Integer.parseInt(holder.tvLikesCount.getText().toString()) + 1;
                     holder.tvLikesCount.setText(String.valueOf(s));
                     holder.tvLikesCount.setTextColor(Color.parseColor("#3B6FA1"));
-                    Toast toast = Toast.makeText(c, "Добавлено в избранное", Toast.LENGTH_SHORT);
-                    toast.show();
-                    clicked = true;
+                   // Toast toast = Toast.makeText(c, "Добавлено в избранное", Toast.LENGTH_SHORT);
+                   // toast.show();
+                    news.isClicked = true;
+
+
                 }else{
+
+                    if(removeFromFavListener != null){
+                    removeFromFavListener.removeFromFavNews(news);}
+
+                    if(removeFromHomeListener != null){
+                        removeFromHomeListener.removeFromHomeNews(news);
+                    }
+
                     holder.like.setImageResource(R.drawable.heart);
                     int s = Integer.parseInt(holder.tvLikesCount.getText().toString()) - 1;
                     holder.tvLikesCount.setText(String.valueOf(s));
                     holder.tvLikesCount.setTextColor(Color.parseColor("#A6A9B0"));
-                    clicked = false;
-            }
+                    news.isClicked = false;
+                }
         }
     });
 
@@ -145,9 +211,6 @@ public class NewsListAdapter extends RecyclerView.Adapter<NewsListAdapter.NewsVi
         }
     }
 
-    interface ItemClickListener {
-        void itemClick(int position, News item);
-    }
 
 }
 

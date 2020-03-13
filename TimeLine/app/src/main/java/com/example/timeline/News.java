@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+
 public class News
         implements Parcelable{
 
@@ -17,6 +19,8 @@ public class News
     private int viewsCount;
     private int img;
 
+    @Nullable public boolean isClicked;
+
     public News(String name,
                 String date,
                 String text,
@@ -24,7 +28,8 @@ public class News
                 int commentsCount,
                 int repostsCount,
                 int viewsCount,
-                int img) {
+                int img,
+                boolean isClicked) {
         this.name = name;
         this.date = date;
         this.text = text;
@@ -33,7 +38,13 @@ public class News
         this.repostsCount = repostsCount;
         this.viewsCount = viewsCount;
         this.img = img;
+        this.isClicked = isClicked;
+
     }
+
+    public boolean isClicked() { return isClicked; }
+
+    public void setClicked(boolean clicked) { isClicked = clicked; }
 
     public int getImg() { return img; }
     public void setImg(int img) { this.img = img; }
